@@ -30,17 +30,17 @@ else
 fi
 
 # Instalação/Atualização do Portainer
-if [ "$(docker ps -a -q -f name=^portainer$)" ]; then
+if [ "$(sudo docker ps -a -q -f name=^portainer$)" ]; then
     echo "Portainer já está instalado. Atualizando a imagem e reiniciando o container..."
-    docker pull portainer/portainer-ce:latest
-    docker stop portainer && docker rm portainer
+    sudo docker pull portainer/portainer-ce:latest
+    sudo docker stop portainer && sudo docker rm portainer
 else
     echo "Instalando Portainer..."
 fi
 
 # Cria o volume e inicia o container do Portainer
-docker volume create portainer_data
-docker run -d -p 8000:8000 -p 9443:9443 --name portainer \
+sudo docker volume create portainer_data
+sudo docker run -d -p 8000:8000 -p 9443:9443 --name portainer \
   --restart always \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v portainer_data:/data \
@@ -54,14 +54,14 @@ if [ ! -d "$SITE_DIR" ]; then
 fi
 
 # Cria (ou atualiza) o container "meu-site" com o Nginx
-if [ "$(docker ps -a -q -f name=^meu-site$)" ]; then
+if [ "$(sudo docker ps -a -q -f name=^meu-site$)" ]; then
     echo "Container 'meu-site' já existe. Atualizando a imagem e reiniciando o container..."
-    docker pull nginx:latest
-    docker stop meu-site && docker rm meu-site
+    sudo docker pull nginx:latest
+    sudo docker stop meu-site && sudo docker rm meu-site
 fi
 
 echo "Criando o container 'meu-site'..."
-docker run -d --name meu-site -p 9001:80 \
+sudo docker run -d --name meu-site -p 9001:80 \
   -v "$SITE_DIR":/usr/share/nginx/html \
   --restart always nginx:latest
 
