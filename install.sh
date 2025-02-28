@@ -77,7 +77,7 @@ fi
 # Se o diretório estiver vazio, copia os arquivos padrão do Nginx para ele
 if [ -z "$(ls -A "$SITE_DIR")" ]; then
     echo "O diretório $SITE_DIR está vazio. Copiando arquivos padrão do Nginx..."
-    docker run --rm -v "$SITE_DIR":/target nginx cp -R /usr/share/nginx/html/* /target/
+    docker run --rm -v "$SITE_DIR":/target nginx sh -c 'cp -R /usr/share/nginx/html/* /target/'
 fi
 
 # Cria (ou atualiza) o container "meu-site" com a imagem Nginx
