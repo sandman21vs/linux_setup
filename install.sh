@@ -1,10 +1,11 @@
 #!/bin/bash
 set -e
 
-# Se não estiver executando como root, reexecuta com sudo
+# Verifica se o script está sendo executado como root
 if [ "$EUID" -ne 0 ]; then
-  echo "Reexecutando com privilégios de root..."
-  exec sudo bash "$0" "$@"
+  echo "Este script precisa ser executado com privilégios de root."
+  echo "Por favor, execute: sudo bash <(curl -fsSL https://raw.githubusercontent.com/sandman21vs/linux_setup/main/install.sh)"
+  exit 1
 fi
 
 # Adiciona o usuário original (se existir) ao grupo docker, se ainda não estiver
@@ -35,9 +36,9 @@ done
 # Instalação do Docker
 if ! command -v docker &>/dev/null; then
     echo "Docker não encontrado. Instalando Docker..."
-    curl -fsSL https://get.docker.com -o get-docker.sh
-    sh get-docker.sh
-    rm get-docker.sh
+    curl -fsSL https://get.docker.com -o /tmp/get-docker.sh
+    sh /tmp/get-docker.sh
+    rm /tmp/get-docker.sh
 else
     echo "Docker já está instalado. Atualizando se necessário..."
     apt install -y docker-ce docker-ce-cli containerd.io
@@ -59,7 +60,7 @@ docker run -d -p 8000:8000 -p 9443:9443 --name portainer \
   -v portainer_data:/data \
   portainer/portainer-ce:latest
 
-# Define o diretório do site na pasta home do usuário original (não em /root)
+# Define o diretório do site na pasta home do usuário original
 if [ -n "$SUDO_USER" ]; then
   USER_HOME=$(eval echo "~$SUDO_USER")
 else
@@ -73,7 +74,7 @@ if [ ! -d "$SITE_DIR" ]; then
     chown "$USER_TO_ADD":"$USER_TO_ADD" "$SITE_DIR"
 fi
 
-# Cria (ou atualiza) o container "meu-site" com o Nginx
+# Cria (ou atualiza) o container "meu-site" com a imagem Nginx
 if [ "$(docker ps -a -q -f name=^meu-site$)" ]; then
     echo "Container 'meu-site' já existe. Atualizando a imagem e reiniciando o container..."
     docker pull nginx:latest
