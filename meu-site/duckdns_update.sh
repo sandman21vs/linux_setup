@@ -16,13 +16,13 @@ if [ -z "$TOKEN" ] || [ -z "$DOMAIN" ]; then
     echo "Configuração salva em $CONFIG_FILE"
 fi
 
-# Atualiza o registro DuckDNS usando IPv6 (curl -6 força a conexão via IPv6)
+# Atualiza o registro DuckDNS usando IPv6
 RESPONSE=$(curl -s -6 "https://www.duckdns.org/update?domains=${DOMAIN}&token=${TOKEN}&ip=auto")
 echo "Resposta do DuckDNS: $RESPONSE"
 
 # Configura cron job para executar este script a cada 10 minutos
 SCRIPT_PATH=$(readlink -f "$0")
-(crontab -l 2>/dev/null | grep -Fv "$SCRIPT_PATH" ; echo "*/10 * * * * $SCRIPT_PATH") | crontab -
+(crontab -l 2>/dev/null | grep -Fv "$SCRIPT_PATH"; echo "*/10 * * * * $SCRIPT_PATH") | crontab -
 echo "Cron job instalado para execução a cada 10 minutos."
 
 # Exibe o endereço do site DuckDNS
