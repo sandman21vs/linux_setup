@@ -108,8 +108,8 @@ Observação: O nome do host é obrigatório.
 
 Caminho: Defina o caminho conforme sua necessidade.
 Tipo: Selecione HTTP.
-URL: Insira o endereço do serviço local, por exemplo, 192.168.100:9001
-(substitua 192.168.100 pelo IP local do dispositivo e :9001 pela porta desejada).
+URL: Insira o endereço do serviço local, por exemplo, 192.168.100.10:9001
+(substitua 192.168.100.10 pelo IP local do dispositivo e :9001 pela porta desejada).
 Salve o túnel após configurar todas as opções.
 Notas Importantes
 
