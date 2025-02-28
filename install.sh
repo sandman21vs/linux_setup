@@ -8,16 +8,29 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
+echo "Atualizando a lista de pacotes..."
+apt update
+
+# Instalação do Docker, se necessário
+if ! command -v docker &>/dev/null; then
+    echo "Docker não encontrado. Instalando Docker..."
+    curl -fsSL https://get.docker.com -o /tmp/get-docker.sh
+    sh /tmp/get-docker.sh
+    rm /tmp/get-docker.sh
+else
+    echo "Docker já está instalado. Atualizando se necessário..."
+    apt install -y docker-ce docker-ce-cli containerd.io
+fi
+
 # Adiciona o usuário original (se existir) ao grupo docker, se ainda não estiver
 USER_TO_ADD="${SUDO_USER:-$USER}"
 if ! id -nG "$USER_TO_ADD" | grep -qw "docker"; then
   echo "Adicionando o usuário $USER_TO_ADD ao grupo docker..."
   usermod -aG docker "$USER_TO_ADD"
-  echo "Atenção: Faça logout e login novamente para que a alteração tenha efeito."
+  # Atualiza as permissões do grupo sem a necessidade de logout
+  newgrp docker
+  echo "O usuário $USER_TO_ADD foi adicionado ao grupo docker."
 fi
-
-echo "Atualizando a lista de pacotes..."
-apt update
 
 # Lista de pacotes a verificar/instalar
 packages=(openssh-server micro btop python3 tailscale)
@@ -32,17 +45,6 @@ for pkg in "${packages[@]}"; do
         apt install -y "$pkg"
     fi
 done
-
-# Instalação do Docker
-if ! command -v docker &>/dev/null; then
-    echo "Docker não encontrado. Instalando Docker..."
-    curl -fsSL https://get.docker.com -o /tmp/get-docker.sh
-    sh /tmp/get-docker.sh
-    rm /tmp/get-docker.sh
-else
-    echo "Docker já está instalado. Atualizando se necessário..."
-    apt install -y docker-ce docker-ce-cli containerd.io
-fi
 
 # Instalação/Atualização do Portainer
 if [ "$(docker ps -a -q -f name=^portainer$)" ]; then
