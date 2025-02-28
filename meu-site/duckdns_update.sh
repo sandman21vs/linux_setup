@@ -1,46 +1,31 @@
 #!/bin/bash
-# DuckDNS Auto Setup Script
-# Este script solicita as informações da sua conta DuckDNS e atualiza automaticamente
-# o domínio com os IPs públicos (IPv4 e IPv6).
+# Atualização automática do DuckDNS via IPv6 para expor a porta 9001
+# Uso: ./duckdns_ipv6.sh SEU_TOKEN SEU_DOMAIN
+# Exemplo: ./duckdns_ipv6.sh your-token-here your-domain
 
-echo "=== Configuração Automática do DuckDNS ==="
-
-# Solicita o e-mail (opcional) e informa que o tipo é free
-read -p "Digite seu e-mail DuckDNS (opcional): " duck_email
-echo "Tipo: free (padrão)"
-
-# Solicita o token, com um valor padrão de exemplo
-read -p "Digite seu token DuckDNS [padrão: your-token-here]: " duck_token
-if [ -z "$duck_token" ]; then
-  duck_token="your-token-here"
-fi
-
-# Solicita o domínio a ser atualizado (somente a parte antes de .duckdns.org)
-read -p "Digite seu domínio DuckDNS (ex: exemplo): " duck_domain
-if [ -z "$duck_domain" ]; then
-  echo "Domínio é obrigatório!"
+# Verifica se os parâmetros foram informados
+if [ "$#" -lt 2 ]; then
+  echo "Uso: $0 <token> <domain>"
   exit 1
 fi
 
-# Informações adicionais (apenas para referência)
-echo "Token gerado: exemplo"
-echo "Data de criação: data de exemplo"
+TOKEN="$1"
+DOMAIN="$2"
 
-# Detecta o IP público IPv4
-echo "Detectando IPv4 atual..."
-ipv4=$(curl -4 -s ifconfig.me)
-echo "IPv4 detectado: $ipv4"
-
-# Detecta o IP público IPv6 (caso esteja disponível)
-echo "Detectando IPv6 atual..."
+# Detecta o IPv6 público
 ipv6=$(curl -6 -s ifconfig.me)
-echo "IPv6 detectado: ${ipv6:-(não encontrado)}"
+if [ -z "$ipv6" ]; then
+  echo "Erro: Não foi possível detectar um endereço IPv6."
+  exit 1
+fi
 
-# Monta a URL de atualização com os parâmetros
-update_url="https://www.duckdns.org/update?domains=${duck_domain}&token=${duck_token}&ip=${ipv4}&ipv6=${ipv6}"
-echo "Atualizando DuckDNS com a URL:"
-echo "$update_url"
+echo "IPv6 detectado: $ipv6"
 
-# Chama a URL e captura a resposta
-result=$(curl -k -s "$update_url")
-echo "Resposta do DuckDNS: $result"
+# Atualiza o DuckDNS com o IPv6 (deixa o IPv4 em branco)
+UPDATE_URL="https://www.duckdns.org/update?domains=${DOMAIN}&token=${TOKEN}&ip=&ipv6=${ipv6}"
+response=$(curl -k -s "$UPDATE_URL")
+
+echo "Resposta do DuckDNS: $response"
+
+# Para acessar seu serviço na porta 9001, use:
+echo "Acesse: http://${DOMAIN}.duckdns.org:9001"
