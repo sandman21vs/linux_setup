@@ -15,13 +15,20 @@ if ! systemctl is-active --quiet docker; then
   systemctl start docker || { echo "Falha ao iniciar o Docker. Tente reiniciar o serviço manualmente."; exit 1; }
 fi
 
-# Verifica as permissões do socket do Docker
+# Ajusta permissões do socket do Docker, se necessário
 if [ ! -w /var/run/docker.sock ]; then
   echo "O socket do Docker (/var/run/docker.sock) não tem permissão de escrita. Ajustando permissões..."
   chmod 666 /var/run/docker.sock
 fi
 
 CURRENT_DIR=$(pwd)
+echo "Verificando se já existe um container 'meu-site'..."
+
+if [ "$(docker ps -a -q -f name=^meu-site$)" ]; then
+  echo "Container 'meu-site' já existe. Parando e removendo..."
+  docker stop meu-site && docker rm meu-site
+fi
+
 echo "Iniciando container Nginx para servir o site localizado em $CURRENT_DIR..."
 
 docker run -d --name meu-site \
