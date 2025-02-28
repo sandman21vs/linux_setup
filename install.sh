@@ -7,6 +7,6 @@ sudo apt update
 sudo apt install -y openssh-server micro btop python3 
 
 # Instala o Tailscale (usando o script oficial)
-curl -fsSL https://tailscale.com/install.sh | sh
+curl -fsSL https://tailscale.com/install.sh | sudo sh
 
 
