@@ -1,7 +1,13 @@
 #!/bin/bash
 set -e
 
-# Garante que estamos no diretório raiz do projeto "meu-site"
+# Verifica se o script está sendo executado como root e, se não, reexecuta com sudo
+if [ "$EUID" -ne 0 ]; then
+  echo "Reexecutando com privilégios de root..."
+  exec sudo bash "$0" "$@"
+fi
+
+# Garante que estamos no diretório atual do projeto
 CURRENT_DIR=$(pwd)
 echo "Iniciando container Nginx para servir o site localizado em $CURRENT_DIR..."
 
