@@ -8,6 +8,12 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
+# Verifica se o grupo docker existe, caso contrário, cria
+if ! getent group docker > /dev/null 2>&1; then
+  echo "Grupo docker não existe. Criando o grupo..."
+  groupadd docker
+fi
+
 # Adiciona o usuário original (se existir) ao grupo docker, se ainda não estiver
 USER_TO_ADD="${SUDO_USER:-$USER}"
 if ! id -nG "$USER_TO_ADD" | grep -qw "docker"; then
