@@ -15,6 +15,6 @@ Você pode executar o script diretamente do repositório com o seguinte comando:
 ```bash
 curl -fsSL https://raw.githubusercontent.com/sandman21vs/linux_setup/main/install.sh -o /tmp/install.sh && sudo bash /tmp/install.sh
 
-
+````
 ```bash
 curl -fsSL https://raw.githubusercontent.com/sandman21vs/linux_setup/main/meu-site/deploy.sh -o /tmp/deploy.sh && bash /tmp/deploy.sh
