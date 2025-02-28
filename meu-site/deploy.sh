@@ -7,6 +7,12 @@ if [ "$EUID" -ne 0 ]; then
   exec sudo bash "$0" "$@"
 fi
 
+# Verifica se o daemon do Docker está ativo; se não, tenta iniciá-lo
+if ! systemctl is-active --quiet docker; then
+  echo "Docker daemon não está ativo. Iniciando o Docker..."
+  systemctl start docker
+fi
+
 # Garante que estamos no diretório atual do projeto
 CURRENT_DIR=$(pwd)
 echo "Iniciando container Nginx para servir o site localizado em $CURRENT_DIR..."
