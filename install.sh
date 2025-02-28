@@ -8,10 +8,11 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
+# Atualiza a lista de pacotes
 echo "Atualizando a lista de pacotes..."
 apt update
 
-# Instalação do Docker, se necessário
+# Instala o Docker se não estiver instalado
 if ! command -v docker &>/dev/null; then
     echo "Docker não encontrado. Instalando Docker..."
     curl -fsSL https://get.docker.com -o /tmp/get-docker.sh
