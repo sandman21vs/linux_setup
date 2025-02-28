@@ -1,31 +1,29 @@
 #!/bin/bash
-# Atualização automática do DuckDNS via IPv6 para expor a porta 9001
-# Uso: ./duckdns_ipv6.sh SEU_TOKEN SEU_DOMAIN
-# Exemplo: ./duckdns_ipv6.sh your-token-here your-domain
 
-# Verifica se os parâmetros foram informados
-if [ "$#" -lt 2 ]; then
-  echo "Uso: $0 <token> <domain>"
-  exit 1
+CONFIG_FILE="${HOME}/.duckdns_config"
+
+# Carrega configurações se já existirem
+if [ -f "$CONFIG_FILE" ]; then
+    source "$CONFIG_FILE"
 fi
 
-TOKEN="$1"
-DOMAIN="$2"
-
-# Detecta o IPv6 público
-ipv6=$(curl -6 -s ifconfig.me)
-if [ -z "$ipv6" ]; then
-  echo "Erro: Não foi possível detectar um endereço IPv6."
-  exit 1
+# Se TOKEN ou DOMAIN não estiverem definidos, solicita ao usuário
+if [ -z "$TOKEN" ] || [ -z "$DOMAIN" ]; then
+    read -p "Digite seu token DuckDNS: " TOKEN
+    read -p "Digite seu domínio DuckDNS: " DOMAIN
+    echo "TOKEN=${TOKEN}" > "$CONFIG_FILE"
+    echo "DOMAIN=${DOMAIN}" >> "$CONFIG_FILE"
+    echo "Configuração salva em $CONFIG_FILE"
 fi
 
-echo "IPv6 detectado: $ipv6"
+# Atualiza o registro DuckDNS usando IPv6 (curl -6 força a conexão via IPv6)
+RESPONSE=$(curl -s -6 "https://www.duckdns.org/update?domains=${DOMAIN}&token=${TOKEN}&ip=auto")
+echo "Resposta do DuckDNS: $RESPONSE"
 
-# Atualiza o DuckDNS com o IPv6 (deixa o IPv4 em branco)
-UPDATE_URL="https://www.duckdns.org/update?domains=${DOMAIN}&token=${TOKEN}&ip=&ipv6=${ipv6}"
-response=$(curl -k -s "$UPDATE_URL")
+# Configura cron job para executar este script a cada 10 minutos
+SCRIPT_PATH=$(readlink -f "$0")
+(crontab -l 2>/dev/null | grep -Fv "$SCRIPT_PATH" ; echo "*/10 * * * * $SCRIPT_PATH") | crontab -
+echo "Cron job instalado para execução a cada 10 minutos."
 
-echo "Resposta do DuckDNS: $response"
-
-# Para acessar seu serviço na porta 9001, use:
-echo "Acesse: http://${DOMAIN}.duckdns.org:9001"
+# Exibe o endereço do site DuckDNS
+echo "Seu site DuckDNS está disponível em: https://${DOMAIN}.duckdns.org"
