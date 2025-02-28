@@ -1,10 +1,11 @@
 #!/bin/bash
 set -e
 
-# Se não estiver executando como root, reexecuta com sudo
+# Verifica se o script está sendo executado como root
 if [ "$EUID" -ne 0 ]; then
-  echo "Reexecutando com privilégios de root..."
-  exec sudo bash "$0" "$@"
+  echo "Este script precisa ser executado com privilégios de root."
+  echo "Por favor, execute: sudo bash <(curl -fsSL https://raw.githubusercontent.com/sandman21vs/linux_setup/main/install.sh)"
+  exit 1
 fi
 
 # Adiciona o usuário original (se existir) ao grupo docker, se ainda não estiver
@@ -22,34 +23,34 @@ apt update
 packages=(openssh-server micro btop python3 tailscale)
 
 for pkg in "${packages[@]}"; do
-    echo "Verificando o pacote $pkg..."
-    if dpkg -s "$pkg" &>/dev/null; then
-        echo "$pkg já está instalado. Atualizando se necessário..."
-        apt install -y "$pkg"
-    else
-        echo "Instalando $pkg..."
-        apt install -y "$pkg"
-    fi
+  echo "Verificando o pacote $pkg..."
+  if dpkg -s "$pkg" &>/dev/null; then
+    echo "$pkg já está instalado. Atualizando se necessário..."
+    apt install -y "$pkg"
+  else
+    echo "Instalando $pkg..."
+    apt install -y "$pkg"
+  fi
 done
 
 # Instalação do Docker
 if ! command -v docker &>/dev/null; then
-    echo "Docker não encontrado. Instalando Docker..."
-    curl -fsSL https://get.docker.com -o get-docker.sh
-    sh get-docker.sh
-    rm get-docker.sh
+  echo "Docker não encontrado. Instalando Docker..."
+  curl -fsSL https://get.docker.com -o get-docker.sh
+  sh get-docker.sh
+  rm get-docker.sh
 else
-    echo "Docker já está instalado. Atualizando se necessário..."
-    apt install -y docker-ce docker-ce-cli containerd.io
+  echo "Docker já está instalado. Atualizando se necessário..."
+  apt install -y docker-ce docker-ce-cli containerd.io
 fi
 
 # Instalação/Atualização do Portainer
 if [ "$(docker ps -a -q -f name=^portainer$)" ]; then
-    echo "Portainer já está instalado. Atualizando a imagem e reiniciando o container..."
-    docker pull portainer/portainer-ce:latest
-    docker stop portainer && docker rm portainer
+  echo "Portainer já está instalado. Atualizando a imagem e reiniciando o container..."
+  docker pull portainer/portainer-ce:latest
+  docker stop portainer && docker rm portainer
 else
-    echo "Instalando Portainer..."
+  echo "Instalando Portainer..."
 fi
 
 docker volume create portainer_data
@@ -62,14 +63,14 @@ docker run -d -p 8000:8000 -p 9443:9443 --name portainer \
 # Criação do diretório e container para o site "meu-site"
 SITE_DIR="$HOME/meu-site"
 if [ ! -d "$SITE_DIR" ]; then
-    echo "Criando a pasta $SITE_DIR..."
-    mkdir -p "$SITE_DIR"
+  echo "Criando a pasta $SITE_DIR..."
+  mkdir -p "$SITE_DIR"
 fi
 
 if [ "$(docker ps -a -q -f name=^meu-site$)" ]; then
-    echo "Container 'meu-site' já existe. Atualizando a imagem e reiniciando o container..."
-    docker pull nginx:latest
-    docker stop meu-site && docker rm meu-site
+  echo "Container 'meu-site' já existe. Atualizando a imagem e reiniciando o container..."
+  docker pull nginx:latest
+  docker stop meu-site && docker rm meu-site
 fi
 
 echo "Criando o container 'meu-site'..."
