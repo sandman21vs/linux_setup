@@ -50,6 +50,12 @@ Para sincronizar os arquivos do repositório GitHub com o diretório do site no 
 curl -fsSL https://raw.githubusercontent.com/sandman21vs/linux_setup/main/meu-site/update_site.sh -o /tmp/update_site.sh && bash /tmp/update_site.sh
 ```
 
+Apagar tudo que foi instalado 
+Para apagar os arquivos do repositório GitHub com o diretório do site no seu Linux (por exemplo, /home/<seu-usuario>/meu-site), use o script uninstall_all.sh:
+```bash
+curl -fsSL https://raw.githubusercontent.com/sandman21vs/linux_setup/main/uninstall_all.sh -o /tmp/uninstall_all.sh && sudo bash /tmp/uninstall_all.sh
+```
+
 Acesso ao Portainer
 O Portainer é instalado e executado em um container Docker para gerenciar seus containers.
 Acesse o Portainer em: https://<SEU_IP>:9443
