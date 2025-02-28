@@ -22,6 +22,14 @@ else
     apt install -y docker-ce docker-ce-cli containerd.io
 fi
 
+# Verifica se o grupo docker existe e, se não, cria
+if ! getent group docker >/dev/null; then
+  echo "Grupo 'docker' não encontrado. Criando o grupo..."
+  groupadd docker
+else
+  echo "O grupo 'docker' já existe."
+fi
+
 # Adiciona o usuário original (se existir) ao grupo docker, se ainda não estiver
 USER_TO_ADD="${SUDO_USER:-$USER}"
 if ! id -nG "$USER_TO_ADD" | grep -qw "docker"; then
