@@ -8,18 +8,23 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 CURRENT_DIR=$(pwd)
-echo "Verificando se já existe um container 'meu-site'..."
+SITE_DIR="$CURRENT_DIR"  # considerando que você está dentro da pasta "meu-site"
 
+echo "Ajustando permissões para $SITE_DIR..."
+# Define permissões: diretórios 755 e arquivos 644
+find "$SITE_DIR" -type d -exec chmod 755 {} \;
+find "$SITE_DIR" -type f -exec chmod 644 {} \;
+
+echo "Verificando se já existe um container 'meu-site'..."
 if [ "$(docker ps -a -q -f name=^meu-site$)" ]; then
   echo "Container 'meu-site' já existe. Forçando remoção..."
   docker rm -f meu-site
 fi
 
-echo "Iniciando container Nginx para servir o site localizado em $CURRENT_DIR..."
-
+echo "Iniciando container Nginx para servir o site localizado em $SITE_DIR..."
 docker run -d --name meu-site \
   -p 9001:80 \
-  -v "$CURRENT_DIR":/usr/share/nginx/html \
+  -v "$SITE_DIR":/usr/share/nginx/html \
   --restart always \
   nginx:latest
 
