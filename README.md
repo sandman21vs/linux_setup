@@ -74,3 +74,46 @@ Você pode personalizar estes arquivos conforme sua necessidade para criar seu s
 Personalização
 Este projeto é uma base para que você possa criar, personalizar e hospedar seu próprio site de forma simplificada e em autocustódia. Basta editar os arquivos conforme o seu desejo e usar os scripts de deploy e atualização para manter seu site atualizado.
 
+Configuração do Cloudflare Tunnel
+Para configurar o Cloudflare Tunnel e expor serviços de forma segura, siga os passos abaixo:
+
+Acesse o Dashboard do Cloudflare
+
+Entre em https://dash.cloudflare.com/.
+Crie uma conta gratuita, se ainda não tiver.
+Inicie a Criação do Túnel
+
+No menu, clique em Zero Trust.
+Vá para Redes e depois Tunnels.
+Clique em Criar novo túnel e selecione Cloudflared (Recomendado).
+Nomeie e Configure o Ambiente
+
+Nomeie seu túnel: Escolha um nome que identifique sua conexão.
+Escolha seu ambiente: Selecione debian (ou o que corresponda à sua distribuição).
+Instalação do Cloudflared
+
+Copie e cole o comando abaixo no seu terminal para baixar e instalar o Cloudflared:
+ ``` bash
+curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb &&
+sudo dpkg -i cloudflared.deb &&
+sudo cloudflared service install egahdsjhfcnewlawksdalsjfcmewsakdzjc.................................(sua chave de api)......................afdshcjhnmqwalkhsfjdmcpeada
+```
+Atenção: Ao executar o comando, cole sua chave de API no local indicado. Aguarde a execução concluir.
+Definindo as Configurações do Túnel
+Após a instalação, prossiga com as definições:
+
+Subdomínio (Opcional): Informe se desejar um subdomínio.
+Domínio (Obrigatório): Selecione ou digite seu domínio.
+Observação: O nome do host é obrigatório.
+
+Caminho: Defina o caminho conforme sua necessidade.
+Tipo: Selecione HTTP.
+URL: Insira o endereço do serviço local, por exemplo, 192.168.100:9001
+(substitua 192.168.100 pelo IP local do dispositivo e :9001 pela porta desejada).
+Salve o túnel após configurar todas as opções.
+Notas Importantes
+
+Para utilizar o Cloudflare Tunnel, é necessário possuir um domínio pago.
+Caso não queira investir em um domínio, você pode utilizar o DuckDNS como alternativa gratuita.
+Com essas instruções, você poderá configurar o Cloudflare Tunnel no seu ambiente seguindo o fluxo indicado no Cloudflare Dashboard e utilizar o Cloudflared para gerenciar a conexão. Basta incluir essa seção no seu arquivo .me e compartilhar com quem desejar.
+
