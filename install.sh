@@ -74,6 +74,12 @@ if [ ! -d "$SITE_DIR" ]; then
     chown "$USER_TO_ADD":"$USER_TO_ADD" "$SITE_DIR"
 fi
 
+# Se o diretório estiver vazio, copia os arquivos padrão do Nginx para ele
+if [ -z "$(ls -A "$SITE_DIR")" ]; then
+    echo "O diretório $SITE_DIR está vazio. Copiando arquivos padrão do Nginx..."
+    docker run --rm -v "$SITE_DIR":/target nginx cp -R /usr/share/nginx/html/* /target/
+fi
+
 # Cria (ou atualiza) o container "meu-site" com a imagem Nginx
 if [ "$(docker ps -a -q -f name=^meu-site$)" ]; then
     echo "Container 'meu-site' já existe. Atualizando a imagem e reiniciando o container..."
