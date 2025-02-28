@@ -17,4 +17,4 @@ curl -fsSL https://raw.githubusercontent.com/sandman21vs/linux_setup/main/instal
 
 ````
 ```bash
-curl -fsSL https://raw.githubusercontent.com/sandman21vs/linux_setup/main/meu-site/deploy.sh -o /tmp/deploy.sh && bash /tmp/deploy.sh
+curl -fsSL https://raw.githubusercontent.com/sandman21vs/linux_setup/main/meu-site/deploy.sh -o /tmp/deploy.sh && sudo bash /tmp/deploy.sh
