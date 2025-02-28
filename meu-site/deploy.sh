@@ -8,20 +8,35 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 CURRENT_DIR=$(pwd)
-SITE_DIR="$CURRENT_DIR"  # considerando que você está dentro da pasta "meu-site"
+echo "Diretório atual: $CURRENT_DIR"
 
-echo "Ajustando permissões para $SITE_DIR..."
-# Define permissões: diretórios 755 e arquivos 644
+# Verifica se index.html existe no diretório atual.
+if [ -f "$CURRENT_DIR/index.html" ]; then
+  SITE_DIR="$CURRENT_DIR"
+else
+  # Se não existir, verifica se existe em uma subpasta 'meu-site'
+  if [ -d "$CURRENT_DIR/meu-site" ] && [ -f "$CURRENT_DIR/meu-site/index.html" ]; then
+    echo "index.html não encontrado no diretório atual, mas encontrado em '$CURRENT_DIR/meu-site'."
+    SITE_DIR="$CURRENT_DIR/meu-site"
+  else
+    echo "index.html não foi encontrado. Verifique a estrutura de diretórios."
+    exit 1
+  fi
+fi
+
+echo "Servindo arquivos a partir de: $SITE_DIR"
+
+# Ajusta as permissões para garantir que o Nginx consiga ler os arquivos
 find "$SITE_DIR" -type d -exec chmod 755 {} \;
 find "$SITE_DIR" -type f -exec chmod 644 {} \;
 
-echo "Verificando se já existe um container 'meu-site'..."
+# Remove o container 'meu-site' existente, se houver
 if [ "$(docker ps -a -q -f name=^meu-site$)" ]; then
-  echo "Container 'meu-site' já existe. Forçando remoção..."
+  echo "Container 'meu-site' já existe. Removendo..."
   docker rm -f meu-site
 fi
 
-echo "Iniciando container Nginx para servir o site localizado em $SITE_DIR..."
+echo "Iniciando container Nginx para servir o site..."
 docker run -d --name meu-site \
   -p 9001:80 \
   -v "$SITE_DIR":/usr/share/nginx/html \
